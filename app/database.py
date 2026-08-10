@@ -10,6 +10,13 @@ DATABASE_URL = os.getenv(
     "sqlite:///./complaints.db",
 )
 
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql://",
+        "postgresql+psycopg://",
+        1,
+    )
+
 
 class Base(DeclarativeBase):
     """
