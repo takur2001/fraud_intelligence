@@ -1,23 +1,47 @@
-# Python cache
-__pycache__/
-*.py[cod]
-
-# Virtual environment
-venv/
-.venv/
-
 # Environment variables and secrets
 .env
+*.env
 
-# Database files
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database files
 *.db
 *.sqlite
 *.sqlite3
 
-# Editor files
+# Streamlit files
+.streamlit/secrets.toml
+
+# Testing and coverage files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type-checking and linting caches
+.mypy_cache/
+.ruff_cache/
+
+# Build and package files
+build/
+dist/
+*.egg-info/
+
+# IDE and editor settings
 .vscode/
 .idea/
 
-# Operating system files
+# Operating-system files
 .DS_Store
 Thumbs.db
+
+# Log files
+*.log

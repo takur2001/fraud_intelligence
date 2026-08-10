@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from app import models
 from app.database import engine
-from app.routers import complaints
+from app.routers import auth, complaints
 
 
 @asynccontextmanager
@@ -40,3 +40,4 @@ def health_check() -> dict[str, str]:
 
 
 app.include_router(complaints.router)
+app.include_router(auth.router)

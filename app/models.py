@@ -11,8 +11,12 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.orm import Mapped, mapped_column
-
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    relationship,
+)
 from app.database import Base
 
 
@@ -76,6 +80,10 @@ class Complaint(Base):
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+    emails: Mapped[list["ComplaintEmail"]] = relationship(
+    back_populates="complaint",
+    cascade="all, delete-orphan",
+)
 
 
 class ComplaintAnalysis(Base):
@@ -208,3 +216,93 @@ class ComplaintAnalysis(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+
+class UserRole(str, Enum):
+    CUSTOMER = "customer"
+    MANAGER = "manager"
+
+class User(Base):
+    """
+    Stores application users and their roles.
+    """
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    full_name: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    email: Mapped[str] = mapped_column(
+        String(255),
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+
+    hashed_password: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    role: Mapped[UserRole] = mapped_column(
+        SQLEnum(UserRole),
+        default=UserRole.CUSTOMER,
+        nullable=False,
+        index=True,
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        nullable=False,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+class ComplaintEmail(Base):
+    """
+    Stores an AI-generated customer email.
+    """
+
+    __tablename__ = "complaint_emails"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    complaint_id: Mapped[int] = mapped_column(
+        ForeignKey("complaints.id"),
+        nullable=False,
+        index=True,
+    )
+
+    subject: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    email_body: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    generated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+    complaint: Mapped["Complaint"] = relationship(
+    back_populates="emails",
+)
