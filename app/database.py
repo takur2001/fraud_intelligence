@@ -1,10 +1,14 @@
+import os
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
-DATABASE_URL = "sqlite:///./complaints.db"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./complaints.db",
+)
 
 
 class Base(DeclarativeBase):
@@ -15,9 +19,20 @@ class Base(DeclarativeBase):
     pass
 
 
+engine_options: dict = {
+    "pool_pre_ping": True,
+}
+
+
+if DATABASE_URL.startswith("sqlite"):
+    engine_options["connect_args"] = {
+        "check_same_thread": False,
+    }
+
+
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False},
+    **engine_options,
 )
 
 
