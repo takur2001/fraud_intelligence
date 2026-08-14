@@ -74,3 +74,4 @@ app.include_router(
 app.include_router(
     auth.router
 )
+
